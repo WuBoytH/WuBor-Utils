@@ -3,11 +3,9 @@
 use {
     std::sync::Once,
     smash::{
-        lua2cpp::L2CFighterCommon,
         phx::Vector3f,
         app::*,
-    },
-    smashline::*
+    }
 };
 
 // System
@@ -279,16 +277,6 @@ pub static YU_SEQ: [&'static str; 8] = ["attack", "special_n", "special_l", "spe
 // Chrom
 pub const FIGHTER_CHROM_STATUS_SPECIAL_LW_FLAG_CHANGE_KINETIC : i32 = 0x21000015;
 
-#[fighter_reset]
-fn fighter_reset(_fighter: &mut L2CFighterCommon) {
-    unsafe {
-        DK_COUNT = 0;
-        if !smashball::is_training_mode() {
-            FGC_TRAINING = false;
-        }
-    }
-}
-
 pub mod singletons {
     // All credit for this to blujay, macros are very cool
     use super::*;
@@ -339,7 +327,4 @@ pub mod singletons {
 
 pub fn install() {
     singletons::init();
-    install_agent_resets!(
-        fighter_reset
-    );
 }
