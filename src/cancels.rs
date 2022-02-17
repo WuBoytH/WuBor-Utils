@@ -57,8 +57,7 @@ pub unsafe fn special_cancel_common(fighter: &mut L2CFighterCommon, situation: L
     let special_hi = WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI);
     let special_lw = WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_LW);
     let super_special2 = WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SUPER_SPECIAL2);
-    let allowed_iter = allowed_terms.iter();
-    for val in allowed_iter {
+    for val in allowed_terms.iter() {
         WorkModule::enable_transition_term(fighter.module_accessor, *val);
     }
     if situation.get_i32() != *SITUATION_KIND_GROUND {
@@ -111,8 +110,7 @@ pub unsafe fn normal_cancel_common(fighter: &mut L2CFighterCommon, allowed_terms
     let shoot = WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ITEM_SHOOT);
     let shoot_3 = WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ITEM_SHOOT_S3);
     let shoot_4 = WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ITEM_SHOOT_S4);
-    let allowed_iter = allowed_terms.iter();
-    for val in allowed_iter {
+    for val in allowed_terms.iter() {
         WorkModule::enable_transition_term(fighter.module_accessor, *val);
     }
     ret = fighter.sub_transition_group_check_ground_attack().get_bool();
