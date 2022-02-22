@@ -8,7 +8,7 @@ use {
 
 pub unsafe fn jump_cancel_common(fighter: &mut L2CFighterCommon, situation: L2CValue) -> L2CValue {
     let mut ret;
-    let terms = [
+    let const terms = [
         *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_SQUAT_BUTTON,
         *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_SQUAT,
         *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_AERIAL_BUTTON,
@@ -43,7 +43,7 @@ pub unsafe fn jump_cancel_common(fighter: &mut L2CFighterCommon, situation: L2CV
 
 pub unsafe fn special_cancel_common(fighter: &mut L2CFighterCommon, situation: L2CValue, allowed_terms: Vec<i32>) -> L2CValue {
     let ret;
-    let terms = [
+    let const terms = [
         *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_N,
         *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_S,
         *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI,
@@ -91,7 +91,7 @@ pub unsafe fn aerial_cancel_common(fighter: &mut L2CFighterCommon) -> L2CValue {
 
 pub unsafe fn normal_cancel_common(fighter: &mut L2CFighterCommon, allowed_terms: Vec<i32>) -> L2CValue {
     let ret;
-    let terms = [
+    let const terms = [
         *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK,
         *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_S3,
         *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_HI3,
