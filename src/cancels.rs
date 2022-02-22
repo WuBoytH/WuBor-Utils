@@ -15,7 +15,7 @@ pub unsafe fn jump_cancel_common(fighter: &mut L2CFighterCommon, situation: L2CV
         *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_AERIAL,
         *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_AIR
     ];
-    let mut enableds = [false; terms.len()];
+    let mut enableds = [false; 5];
     for x in 0..terms.len() {
         enableds[x] = WorkModule::is_enable_transition_term(fighter.module_accessor, terms[x]);
     }
@@ -57,7 +57,7 @@ pub unsafe fn special_cancel_common(fighter: &mut L2CFighterCommon, situation: L
         *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SUPER_SPECIAL2,
         *FIGHTER_STATUS_TRANSITION_TERM_ID_FINAL
     ];
-    let mut enableds = [false; terms.len()];
+    let mut enableds = [false; 12];
     for x in 0..terms.len() {
         enableds[x] = WorkModule::is_enable_transition_term(fighter.module_accessor, terms[x]);
     }
@@ -106,7 +106,7 @@ pub unsafe fn normal_cancel_common(fighter: &mut L2CFighterCommon, allowed_terms
         *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ITEM_SHOOT_S3,
         *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ITEM_SHOOT_S4
     ];
-    let mut enableds = [false; terms.len()];
+    let mut enableds = [false; 13];
     for x in 0..terms.len() {
         enableds[x] = WorkModule::is_enable_transition_term(fighter.module_accessor, terms[x]);
     }
