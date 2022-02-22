@@ -217,6 +217,7 @@ pub mod FGCModule {
         }
         else {
             WarkModule::reset_i32(fighter.module_accessor, flag);
+            WorkModule::set_int(fighter.module_accessor, 0, timer_flag);
         }
     }
     
