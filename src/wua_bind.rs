@@ -209,6 +209,17 @@ pub mod FGCModule {
         WorkModule::set_int(fighter.module_accessor, 0, timer_flag);
     }
     
+    pub unsafe fn check_command_inc(fighter: &mut L2CFighterCommon, flag: i32, timer_flag: i32, window: i32) {
+        if WorkModule::get_int(fighter.module_accessor, timer_flag) <= window {
+            if WorkModule::get_int(fighter.module_accessor, flag) > 1 {
+                WorkModule::inc_int(fighter.module_accessor, timer_flag);
+            }
+        }
+        else {
+            WarkModule::reset_i32(fighter.module_accessor, flag);
+        }
+    }
+    
     pub unsafe fn disable_ground_normal(fighter: &mut L2CFighterCommon, ground_normal_mask: i32) {
         if !CancelModule::is_enable_cancel(fighter.module_accessor) {
             let mut used_ground_normals = WorkModule::get_int(fighter.module_accessor, FIGHTER_INSTANCE_WORK_ID_INT_USED_GROUND_NORMALS);
