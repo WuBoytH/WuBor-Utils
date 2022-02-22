@@ -18,6 +18,7 @@ pub unsafe fn jump_cancel_common(fighter: &mut L2CFighterCommon, situation: L2CV
     let mut enableds = [false; 5];
     for x in 0..terms.len() {
         enableds[x] = WorkModule::is_enable_transition_term(fighter.module_accessor, terms[x]);
+        WorkModule::enable_transition_term(fighter.module_accessor, terms[x]);
     }
     if situation.get_i32() != *SITUATION_KIND_GROUND {
         if fighter.global_table[0x20].get_i32() & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_N != 0 {
