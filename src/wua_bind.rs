@@ -259,23 +259,23 @@ pub mod FGCModule {
     }
 
     /// Used for command inputs. Currently goes unused.
-    pub unsafe fn inc_command(fighter: &mut L2CFighterCommon, flag: i32, timer_flag: i32) {
-        WorkModule::inc_int(fighter.module_accessor, flag);
-        WorkModule::set_int(fighter.module_accessor, 0, timer_flag);
-    }
+    // pub unsafe fn inc_command(fighter: &mut L2CFighterCommon, flag: i32, timer_flag: i32) {
+    //     WorkModule::inc_int(fighter.module_accessor, flag);
+    //     WorkModule::set_int(fighter.module_accessor, 0, timer_flag);
+    // }
     
     /// Checks the timer for a command input. Resets the command input if the timer exceeds the window, otherwise increments the timer by 1.
-    pub unsafe fn check_command_inc(fighter: &mut L2CFighterCommon, flag: i32, timer_flag: i32, window: i32) {
-        if WorkModule::get_int(fighter.module_accessor, timer_flag) <= window {
-            if WorkModule::get_int(fighter.module_accessor, flag) > 1 {
-                WorkModule::inc_int(fighter.module_accessor, timer_flag);
-            }
-        }
-        else {
-            WarkModule::reset_i32(fighter.module_accessor, flag);
-            WorkModule::set_int(fighter.module_accessor, 0, timer_flag);
-        }
-    }
+    // pub unsafe fn check_command_inc(fighter: &mut L2CFighterCommon, flag: i32, timer_flag: i32, window: i32) {
+    //     if WorkModule::get_int(fighter.module_accessor, timer_flag) <= window {
+    //         if WorkModule::get_int(fighter.module_accessor, flag) > 1 {
+    //             WorkModule::inc_int(fighter.module_accessor, timer_flag);
+    //         }
+    //     }
+    //     else {
+    //         WarkModule::reset_i32(fighter.module_accessor, flag);
+    //         WorkModule::set_int(fighter.module_accessor, 0, timer_flag);
+    //     }
+    // }
 
     /// Disables a grounded attack. Used for cancel systems with complex cancel trees.
     pub unsafe fn disable_ground_normal(fighter: &mut L2CFighterCommon, ground_normal_mask: i32) {
