@@ -17,24 +17,31 @@ use {
 pub mod WarkModule {
     use super::*;
 
+    /// A shortcut to reset i32 variables to 0.
     pub unsafe fn reset_i32(module_accessor: *mut BattleObjectModuleAccessor, flag: i32) {
         WorkModule::set_int(module_accessor, 0, flag);
     }
 
+    /// A shortcut to reset f32 variables to 0.
     pub unsafe fn reset_f32(module_accessor: *mut BattleObjectModuleAccessor, flag: i32) {
         WorkModule::set_float(module_accessor, 0.0, flag);
     }
 
+    /// A shortcut to add a value to an i32 variable.
     pub unsafe fn add_i32(module_accessor: *mut BattleObjectModuleAccessor, flag: i32, amount: i32) {
         let counter = WorkModule::get_int(module_accessor, flag) + amount;
         WorkModule::set_int(module_accessor, counter, flag);
     }
 
+    /// A shortcut to add a value to an f32 variable.
     pub unsafe fn add_f32(module_accessor: *mut BattleObjectModuleAccessor, flag: i32, amount: f32) {
         let counter = WorkModule::get_float(module_accessor, flag) + amount;
         WorkModule::set_float(module_accessor, counter, flag);
     }
 
+    /// A function for incrementing an f32 variable by an amount.
+    /// This function takes into account the effects of slowdown, such as from
+    /// Bayonett's Witch Time or from the Timer item.
     pub unsafe fn count_down(module_accessor: *mut BattleObjectModuleAccessor, flag: i32, amount: f32) {
         let slow_rate = SlowModule::rate(module_accessor);
         let global_slow_rate = sv_information::slow_rate();
@@ -47,6 +54,7 @@ pub mod WarkModule {
 pub mod FGCModule {
     use super::*;
 
+    /// A function used to enable jump-cancels, styled after the special cancel functions that Ryu, Ken, and Terry use.
     pub unsafe fn jump_cancel_check_hit(fighter: &mut L2CFighterCommon, jump_on_block: bool) -> L2CValue {
         let cancel_timer = WorkModule::get_float(fighter.module_accessor, FIGHTER_STATUS_WORK_ID_FLOAT_CANCEL_TIMER);
         if (AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT)
@@ -62,11 +70,13 @@ pub mod FGCModule {
         }
     }
 
+    /// A function used to enable jump-cancels, but it forces the jump-cancel regardless of if you hit anything.
     pub unsafe fn jump_cancel_check_exception(fighter: &mut L2CFighterCommon) -> L2CValue {
         let sit = fighter.global_table[SITUATION_KIND].get_i32();
         jump_cancel_common(fighter, sit.into())
     }
 
+    /// Used to enable dash-cancels. You need to specify whether you're cancelling into a forward dash (reverse = false) or back dash (reverse = true);
     pub unsafe fn dash_cancel_check(fighter: &mut L2CFighterCommon, dash_on_block: bool, reverse: bool) -> L2CValue {
         let dir;
         let cat;
@@ -95,6 +105,22 @@ pub mod FGCModule {
         false.into()
     }
 
+    /// Enables cancels that would normally be impossible using the existing cancel system.
+    ///
+    /// # Arguments
+    ///
+    /// * `next_status` - The status kind you want to transition to (*FIGHTER_STATUS_KIND_XXXXXX)
+    /// * `cat1_compare` - The cat1 flag you wish to check in order to transition to the next status (*FIGHTER_PAD_CMD_CAT1_FLAG_XXXXXX)
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// // Checks if you are in the Forward Tilt status, then checks if you input another Forward Tilt.
+    /// // On hit, it will transition into Dash Attack.
+    /// if StatusModule::status_kind(fighter.module_accessor) == *FIGHTER_STATUS_KIND_ATTACK_S3 {
+    ///     FGCModule::cancel_exceptions(fighter, *FIGHTER_STATUS_KIND_ATTACK_DASH, *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_S3, true);
+    /// }
+    /// ```
     pub unsafe fn cancel_exceptions(fighter: &mut L2CFighterCommon, next_status: i32, cat1_compare: i32, on_hit: bool) -> L2CValue {
         let cat1 = ControlModule::get_command_flag_cat(fighter.module_accessor, 0);
         let cancel_timer = WorkModule::get_float(fighter.module_accessor, FIGHTER_STATUS_WORK_ID_FLOAT_CANCEL_TIMER);
@@ -112,6 +138,23 @@ pub mod FGCModule {
         false.into()
     }
 
+    /// Used for moves that are able to cancel into themselves.
+    /// # Arguments
+    ///
+    /// * `next_status` - The status kind you want to transition to (*FIGHTER_STATUS_KIND_XXXXXX)
+    /// * `cat1_compare` - The cat1 flag you wish to check in order to transition to the next status (*FIGHTER_PAD_CMD_CAT1_FLAG_XXXXXX)
+    /// * `counter` - The constant you're using to store the number of times you chain cancelled a move.
+    /// * `max` - How many times you will be allowed to chain cancel a move before needed to go into normal endlag.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// // Checks if you are in the Down Tilt status, then checks if you input another Down Tilt.
+    /// // On hit, it will transition into Dash Attack.
+    /// if StatusModule::status_kind(fighter.module_accessor) == *FIGHTER_STATUS_KIND_ATTACK_LW3 {
+    ///     FGCModule::chain_cancels(fighter, *FIGHTER_STATUS_KIND_ATTACK_LW3, *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_LW3, true, FIGHTER_DOLLY_INSTANCE_WORK_ID_INT_D_TILT_CHAIN_COUNT, 2);
+    /// }
+    /// ```
     pub unsafe fn chain_cancels(fighter: &mut L2CFighterCommon, next_status: i32, cat1_compare: i32, on_hit: bool, counter: i32, max: i32) -> L2CValue {
         let cat1 = ControlModule::get_command_flag_cat(fighter.module_accessor, 0);
         let cancel_timer = WorkModule::get_float(fighter.module_accessor, FIGHTER_STATUS_WORK_ID_FLOAT_CANCEL_TIMER);
@@ -130,6 +173,13 @@ pub mod FGCModule {
         0.into()
     }
 
+    /// The generic cancel system, used to enable special cancels for any character.
+    /// # Arguments
+    ///
+    /// * `normal_cancels` - A vector of all of the ground attack transition terms you can cancel into.
+    /// * `special_cancels` - A vector of all of the special move transition terms you can cancel into.
+    /// * `aerial_cancel` - Checks if you can cancel into an aerial.
+    /// * `jump_cancel` - Checks if you can jump-cancel. 0 = None | 1 = On Hit | 2 = On Hit or Block
     pub unsafe fn cancel_system(fighter: &mut L2CFighterCommon, normal_cancels: Vec<i32>, special_cancels: Vec<i32>, aerial_cancel: bool, jump_cancel: i32) {
         let cancel_timer = WorkModule::get_float(fighter.module_accessor, FIGHTER_STATUS_WORK_ID_FLOAT_CANCEL_TIMER);
         if (AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT)
@@ -159,6 +209,10 @@ pub mod FGCModule {
         }
     }
 
+    /// Checks the direction of the left stick and returns a number between 1 and 9, representing numpad notation.
+    /// # Arguments
+    /// 
+    /// * `command` - Set to true to have the horizontal stick value reversed, so that it checks the input as if you are facing right.
     pub unsafe fn get_command_stick_direction(fighter: &mut L2CFighterCommon, command: bool) -> i32 {
         let status_kind = StatusModule::status_kind(fighter.module_accessor);
         let mut stick_x = fighter.global_table[STICK_X].get_f32();
@@ -204,11 +258,13 @@ pub mod FGCModule {
         }
     }
 
+    /// Used for command inputs. Currently goes unused.
     pub unsafe fn inc_command(fighter: &mut L2CFighterCommon, flag: i32, timer_flag: i32) {
         WorkModule::inc_int(fighter.module_accessor, flag);
         WorkModule::set_int(fighter.module_accessor, 0, timer_flag);
     }
     
+    /// Checks the timer for a command input. Resets the command input if the timer exceeds the window, otherwise increments the timer by 1.
     pub unsafe fn check_command_inc(fighter: &mut L2CFighterCommon, flag: i32, timer_flag: i32, window: i32) {
         if WorkModule::get_int(fighter.module_accessor, timer_flag) <= window {
             if WorkModule::get_int(fighter.module_accessor, flag) > 1 {
@@ -220,7 +276,8 @@ pub mod FGCModule {
             WorkModule::set_int(fighter.module_accessor, 0, timer_flag);
         }
     }
-    
+
+    /// Disables a grounded attack. Used for cancel systems with complex cancel trees.
     pub unsafe fn disable_ground_normal(fighter: &mut L2CFighterCommon, ground_normal_mask: i32) {
         if !CancelModule::is_enable_cancel(fighter.module_accessor) {
             let mut used_ground_normals = WorkModule::get_int(fighter.module_accessor, FIGHTER_INSTANCE_WORK_ID_INT_USED_GROUND_NORMALS);
@@ -231,6 +288,8 @@ pub mod FGCModule {
         }
     }
 
+    /// Used when checking for attack inputs to disable certain attacks if they are used in a string.
+    /// Used for cancel systems with complex cancel trees.
     pub unsafe fn set_used_ground_normal_transition_terms(fighter: &mut L2CFighterCommon) {
         if !CancelModule::is_enable_cancel(fighter.module_accessor) {
             let used_mask = WorkModule::get_int(fighter.module_accessor, FIGHTER_INSTANCE_WORK_ID_INT_USED_GROUND_NORMALS);
@@ -264,6 +323,8 @@ pub mod FGCModule {
         }
     }
 
+    /// Resets your current cancel string. Typically only resets if CancelModule::is_enable_cancel is true, but
+    /// the ignore flag can be passed to bypass that.
     pub unsafe fn reset_used_ground_normals(fighter: &mut L2CFighterCommon, ignore: bool) {
         if ignore || (CancelModule::is_enable_cancel(fighter.module_accessor)
         || MotionModule::is_end(fighter.module_accessor))
@@ -288,6 +349,7 @@ pub mod FGCModule {
         }
     }
 
+    /// Disables an aerial. Used for characters who can cancel aerials into other aerials.
     pub unsafe fn disable_aerial(fighter: &mut L2CFighterCommon, aerial_mask: i32) {
         if !CancelModule::is_enable_cancel(fighter.module_accessor) {
             let mut used_aerials = WorkModule::get_int(fighter.module_accessor, FIGHTER_INSTANCE_WORK_ID_INT_USED_AERIALS);
@@ -298,6 +360,7 @@ pub mod FGCModule {
         }
     }
 
+    /// Checks if certain aerials are enabled.
     pub unsafe fn check_enabled_aerial(fighter: &mut L2CFighterCommon) -> bool {
         if WorkModule::is_flag(fighter.module_accessor, FIGHTER_STATUS_WORK_ID_FLAG_NORMAL_CANCEL)
         && !CancelModule::is_enable_cancel(fighter.module_accessor) {
@@ -318,6 +381,7 @@ pub mod FGCModule {
         true
     }
 
+    /// Resets your aerial cancel string, enabling all aerials again.
     pub unsafe fn reset_used_aerials(fighter: &mut L2CFighterCommon) {
         WorkModule::set_int(fighter.module_accessor, 0, FIGHTER_INSTANCE_WORK_ID_INT_USED_AERIALS);
     }
@@ -327,6 +391,7 @@ pub mod FGCModule {
 pub mod MiscModule {
     use super::*;
 
+    /// Checks if your current status is one where you're being damaged. If is_prev is true, it checks your previous status instead.
     pub unsafe fn is_damage_check(module_accessor: *mut BattleObjectModuleAccessor, is_prev: bool) -> bool {
         let status : i32;
         if is_prev {
@@ -363,6 +428,8 @@ pub mod MiscModule {
         false
     }
 
+    /// Checks if your current status is considered getting damaged, but is different from just normally getting hit.
+    /// If is_prev is true, it checks your previous status instead.
     pub unsafe fn is_illegal_status(module_accessor: *mut BattleObjectModuleAccessor, is_prev: bool) -> bool {
         let status : i32;
         if is_prev {
@@ -394,6 +461,7 @@ pub mod MiscModule {
         false
     }
 
+    /// Forces a wall jump. Will be moved to FGCModule eventually.
     pub unsafe fn wall_jump_check(fighter: &mut L2CFighterCommon) {
         if GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32)
         || GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_LEFT_SIDE as u32) {
@@ -405,6 +473,7 @@ pub mod MiscModule {
         }
     }
 
+    /// Creates the "critical hit" effect. Will be replaced later with a better implementation.
     pub unsafe fn critical_zoom(fighter: &mut L2CFighterCommon, rate: u8, frames: f32, zoom: f32) {
         if !SoundModule::is_playing(fighter.module_accessor, Hash40::new("se_common_finishhit")) {
             macros::EFFECT(fighter, Hash40::new("sys_bg_criticalhit"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
@@ -418,6 +487,7 @@ pub mod MiscModule {
         }
     }
 
+    /// Used in Fighting Game Mode to reduce a fighter's HP to their Fighting Game Mode value.
     pub unsafe fn set_hp(fighter: &mut L2CFighterCommon, hp: f32) {
         if DamageModule::damage(fighter.module_accessor, 0) < hp
         && !smashball::is_training_mode() {
