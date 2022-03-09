@@ -141,7 +141,6 @@ pub mod FGCModule {
     /// Used for moves that are able to cancel into themselves.
     /// # Arguments
     ///
-    /// * `next_status` - The status kind you want to transition to (*FIGHTER_STATUS_KIND_XXXXXX)
     /// * `cat1_compare` - The cat1 flag you wish to check in order to transition to the next status (*FIGHTER_PAD_CMD_CAT1_FLAG_XXXXXX)
     /// * `counter` - The constant you're using to store the number of times you chain cancelled a move.
     /// * `max` - How many times you will be allowed to chain cancel a move before needed to go into normal endlag.
@@ -155,7 +154,7 @@ pub mod FGCModule {
     ///     FGCModule::chain_cancels(fighter, *FIGHTER_STATUS_KIND_ATTACK_LW3, *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_LW3, true, FIGHTER_DOLLY_INSTANCE_WORK_ID_INT_D_TILT_CHAIN_COUNT, 2);
     /// }
     /// ```
-    pub unsafe fn chain_cancels(fighter: &mut L2CFighterCommon, next_status: i32, cat1_compare: i32, on_hit: bool, counter: i32, max: i32) -> L2CValue {
+    pub unsafe fn chain_cancels(fighter: &mut L2CFighterCommon, cat1_compare: i32, on_hit: bool, counter: i32, max: i32) -> L2CValue {
         let cat1 = ControlModule::get_command_flag_cat(fighter.module_accessor, 0);
         let cancel_timer = WorkModule::get_float(fighter.module_accessor, FIGHTER_STATUS_WORK_ID_FLOAT_CANCEL_TIMER);
         if !on_hit
@@ -163,9 +162,10 @@ pub mod FGCModule {
         || AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_SHIELD))
         && !fighter.global_table[IN_HITLAG].get_bool()
         && cancel_timer > 0.0) {
+            let count = WorkModule::get_int(fighter.module_accessor, counter) + 1;
             if (cat1 & cat1_compare) != 0
-            && WorkModule::get_int(fighter.module_accessor, counter) < max {
-                StatusModule::change_status_request_from_script(fighter.module_accessor, next_status, true);
+            && count <= max {
+                fighter.attack_mtrans_pre_process();
                 WorkModule::inc_int(fighter.module_accessor, counter);
                 return 1.into();
             }
