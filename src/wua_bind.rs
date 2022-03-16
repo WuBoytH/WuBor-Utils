@@ -48,6 +48,16 @@ pub mod WarkModule {
         let counter = WorkModule::get_float(module_accessor, flag) - (amount * slow_rate * global_slow_rate);
         WorkModule::set_float(module_accessor, counter, flag);
     }
+
+    pub unsafe fn is_operation_cpu(module_accessor: *mut BattleObjectModuleAccessor) -> bool {
+        if utility::get_category(&mut *module_accessor) != *BATTLE_OBJECT_CATEGORY_FIGHTER {
+            return false;
+        }
+        let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as i32;
+        let fighterentryid = smash::app::FighterEntryID(entry_id);
+        let fighterinformation = smash::app::lua_bind::FighterManager::get_fighter_information(singletons::FighterManager(), fighterentryid);
+        smash::app::lua_bind::FighterInformation::is_operation_cpu(fighterinformation)
+    }
 }
 
 #[allow(non_snake_case)]
