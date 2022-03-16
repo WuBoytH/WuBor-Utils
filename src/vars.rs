@@ -328,6 +328,7 @@ pub mod singletons {
     }
 
     expose_singleton!(
+        FighterManager, FIGHTER_MANAGER
         FighterCutInManager, FIGHTER_CUTIN_MANAGER
     );
 
