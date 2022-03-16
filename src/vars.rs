@@ -299,6 +299,7 @@ pub mod singletons {
     
     static INIT : Once = Once::new();
 
+    pub static mut FIGHTER_MANAGER : *const *mut smash::app::FighterManager = 0 as _;
     pub static mut FIGHTER_CUTIN_MANAGER : *const *mut smash::app::FighterCutInManager = 0 as _;
 
     macro_rules! expose_singleton {
@@ -332,6 +333,10 @@ pub mod singletons {
 
     pub fn init() {
         INIT.call_once(|| {
+            assign_symbol!(
+                FIGHTER_MANAGER,
+                "_ZN3lib9SingletonIN3app14FighterManagerEE9instance_E\0"
+            );
             assign_symbol!(
                 FIGHTER_CUTIN_MANAGER,
                 "_ZN3lib9SingletonIN3app19FighterCutInManagerEE9instance_E\0"
