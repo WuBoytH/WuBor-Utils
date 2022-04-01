@@ -13,6 +13,7 @@ pub static mut INT_OFFSET : usize = 0x4E19D0;
 // pub static mut INT64_OFFSET : usize = 0x4E19F0;
 pub static mut FLOAT_OFFSET : usize = 0x4E19D0;
 pub static mut NOTIFY_LOG_EVENT_COLLISION_HIT_OFFSET : usize = 0x675A20;
+pub static mut DEFINE_LUA_CONSTANT_OFFSET : usize = 0x3727390; //13.0.1
 pub static INT_SEARCH_CODE: &[u8] = &[
     0x00, 0x1c, 0x40, 0xf9, 0x08, 0x00, 0x40, 0xf9, 0x03, 0x11, 0x40, 0xf9,
 ];
