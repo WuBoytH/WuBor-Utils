@@ -395,6 +395,20 @@ pub mod FGCModule {
     pub unsafe fn reset_used_aerials(fighter: &mut L2CFighterCommon) {
         WorkModule::set_int(fighter.module_accessor, 0, FIGHTER_INSTANCE_WORK_ID_INT_USED_AERIALS);
     }
+
+    /// Handles adding or subtracting meter.
+    pub unsafe fn update_meter(object: *mut BattleObject, amount: f32, meter_max: f32, meter_const) {
+        let module_accessor = (*object).module_accessor;
+        let mut meter = WorkModule::get_float(module_accessor, meter_const);
+        meter += amount;
+        if meter < 0.0 {
+            meter == 0.0;
+        }
+        if meter > meter_max {
+            meter = meter_max;
+        }
+        WorkModule::set_float(module_accessor, meter, meter_max);
+    }
 }
 
 #[allow(non_snake_case)]
