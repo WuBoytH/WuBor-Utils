@@ -397,7 +397,7 @@ pub mod FGCModule {
     }
 
     /// Handles adding or subtracting meter.
-    pub unsafe fn update_meter(object: *mut BattleObject, amount: f32, meter_max: f32, meter_const) {
+    pub unsafe fn update_meter(object: *mut BattleObject, amount: f32, meter_max: f32, meter_const: i32) {
         let module_accessor = (*object).module_accessor;
         let mut meter = WorkModule::get_float(module_accessor, meter_const);
         meter += amount;
@@ -407,7 +407,7 @@ pub mod FGCModule {
         if meter > meter_max {
             meter = meter_max;
         }
-        WorkModule::set_float(module_accessor, meter, meter_max);
+        WorkModule::set_float(module_accessor, meter, meter_const);
     }
 }
 
