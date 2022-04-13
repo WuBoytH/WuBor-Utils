@@ -531,7 +531,7 @@ pub mod MiscModule {
         );
         WorkModule::set_int64(
             module_accessor,
-            0,
+            smash::hash40("invalid"),
             FIGHTER_STATUS_APPEAL_WORK_INT_APPEAL_ACTION_MOT
         );
         if is_loop {
