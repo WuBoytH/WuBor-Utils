@@ -522,7 +522,7 @@ pub mod MiscModule {
 
     /// Sets all of the values needed for Taunt Hold/Loops.
     pub unsafe fn set_appeal_loop(module_accessor: *mut BattleObjectModuleAccessor, is_loop: bool, loop_mot: u64, restart_frame: i32, buttons: i32) {
-        WorkModule::set_int(module_accessor, button, FIGHTER_STATUS_APPEAL_WORK_INT_APPEAL_HELD_BUTTON);
+        WorkModule::set_int(module_accessor, buttons, FIGHTER_STATUS_APPEAL_WORK_INT_APPEAL_HELD_BUTTON);
         WorkModule::set_int(module_accessor, restart_frame, FIGHTER_STATUS_APPEAL_WORK_INT_APPEAL_RESTART_FRAME);
         WorkModule::set_int64(
             module_accessor,
