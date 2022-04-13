@@ -519,4 +519,20 @@ pub mod MiscModule {
             DamageModule::add_damage(fighter.module_accessor, dmg, 0);
         }
     }
+
+    /// Sets all of the values needed for Taunt Hold/Loops.
+    pub unsafe fn set_appeal_loop(module_accessor: *mut BattleObjectModuleAccessor, is_loop: bool, loop_mot: u64, restart_frame: i32) {
+        WorkModule::set_int(module_accessor, restart_frame, FIGHTER_STATUS_APPEAL_WORK_INT_APPEAL_RESTART_FRAME);
+        WorkModule::set_int64(
+            module_accessor,
+            loop_mot as i64,
+            FIGHTER_STATUS_APPEAL_WORK_INT_APPEAL_LOOP_MOT
+        );
+        if is_loop {
+            WorkModule::on_flag(module_accessor, FIGHTER_STATUS_APPEAL_WORK_FLAG_APPEAL_LOOP);
+        }
+        else {
+            WorkModule::on_flag(module_accessor, FIGHTER_STATUS_APPEAL_WORK_FLAG_APPEAL_HOLD);
+        }
+    }
 }
