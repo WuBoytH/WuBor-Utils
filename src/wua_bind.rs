@@ -529,6 +529,11 @@ pub mod MiscModule {
             loop_mot as i64,
             FIGHTER_STATUS_APPEAL_WORK_INT_APPEAL_LOOP_MOT
         );
+        WorkModule::set_int64(
+            module_accessor,
+            0,
+            FIGHTER_STATUS_APPEAL_WORK_INT_APPEAL_ACTION_MOT
+        );
         if is_loop {
             WorkModule::on_flag(module_accessor, FIGHTER_STATUS_APPEAL_WORK_FLAG_APPEAL_LOOP);
         }
