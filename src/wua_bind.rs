@@ -487,8 +487,12 @@ pub mod MiscModule {
 
     /// Forces a wall jump. Will be moved to FGCModule eventually.
     pub unsafe fn wall_jump_check(fighter: &mut L2CFighterCommon) {
-        if fighter.sub_fighter_general_term_is_can_wall_jump().get_bool() {
-            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_WALL_JUMP, true);
+        if GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32)
+        || GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_LEFT_SIDE as u32) {
+            let cat1 = fighter.global_table[CMD_CAT1].get_i32();
+            if cat1 & (*FIGHTER_PAD_CMD_CAT1_FLAG_TURN_DASH | *FIGHTER_PAD_CMD_CAT1_FLAG_JUMP_BUTTON) != 0 {
+                StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_WALL_JUMP, true);
+            }
         }
     }
 
