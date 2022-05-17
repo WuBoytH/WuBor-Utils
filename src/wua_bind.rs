@@ -488,7 +488,7 @@ pub mod MiscModule {
     /// Forces a wall jump. Will be moved to FGCModule eventually.
     pub unsafe fn wall_jump_check(fighter: &mut L2CFighterCommon) {
         let is_right = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32);
-        let is_left GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_LEFT_SIDE as u32);
+        let is_left = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_LEFT_SIDE as u32);
         let lr = PostureModule::lr(fighter.module_accessor);
         if is_right {
             let cat1 = fighter.global_table[CMD_CAT1].get_i32();
