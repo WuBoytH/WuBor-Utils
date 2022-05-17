@@ -487,11 +487,23 @@ pub mod MiscModule {
 
     /// Forces a wall jump. Will be moved to FGCModule eventually.
     pub unsafe fn wall_jump_check(fighter: &mut L2CFighterCommon) {
-        if GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32)
-        || GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_LEFT_SIDE as u32) {
+        let is_right = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32);
+        let is_left GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_LEFT_SIDE as u32);
+        let lr = PostureModule::lr(fighter.module_accessor);
+        if is_right {
             let cat1 = fighter.global_table[CMD_CAT1].get_i32();
-            if cat1 & (*FIGHTER_PAD_CMD_CAT1_FLAG_TURN_DASH | *FIGHTER_PAD_CMD_CAT1_FLAG_JUMP_BUTTON) != 0 {
+            let dash = if lr < 0.0 { *FIGHTER_PAD_CMD_CAT1_FLAG_DASH } else { *FIGHTER_PAD_CMD_CAT1_FLAG_TURN_DASH };
+            if cat1 & (dash | *FIGHTER_PAD_CMD_CAT1_FLAG_JUMP_BUTTON) != 0 {
                 StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_WALL_JUMP, true);
+                return;
+            }
+        }
+        if is_left {
+            let cat1 = fighter.global_table[CMD_CAT1].get_i32();
+            let dash = if lr < 0.0 { *FIGHTER_PAD_CMD_CAT1_FLAG_TURN_DASH } else { *FIGHTER_PAD_CMD_CAT1_FLAG_DASH };
+            if cat1 & (dash | *FIGHTER_PAD_CMD_CAT1_FLAG_JUMP_BUTTON) != 0 {
+                StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_WALL_JUMP, true);
+                return;
             }
         }
     }
