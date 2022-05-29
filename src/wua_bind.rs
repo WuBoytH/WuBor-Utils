@@ -119,8 +119,8 @@ pub mod FGCModule {
     pub unsafe fn air_dash_cancel_check(fighter: &mut L2CFighterCommon, on_block: bool) -> L2CValue {
         let cancel_timer = WorkModule::get_float(fighter.module_accessor, FIGHTER_STATUS_WORK_ID_FLOAT_CANCEL_TIMER);
         let sit = fighter.global_table[SITUATION_KIND].get_i32();
-        if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT)
-        && (on_block && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_SHIELD))
+        if (AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT)
+        || (on_block && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_SHIELD)))
         && !fighter.global_table[IN_HITLAG].get_bool()
         && cancel_timer > 0.0 {
             if airdash_cancel_common(fighter, sit.into()).get_bool() {
