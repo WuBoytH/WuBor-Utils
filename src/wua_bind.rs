@@ -115,6 +115,16 @@ pub mod FGCModule {
         false.into()
     }
 
+    /// Used to check air dash cancels. This is set-up so you can only air dash, not air dodge.
+    pub unsafe fn air_dash_cancel_check(fighter: &mut L2CFighterCommon) -> L2CValue {
+        let sit = fighter.global_table[SITUATION_KIND].get_i32();
+        let airdash = airdash_cancel_common(fighter, sit.into()).get_bool();
+        if airdash {
+            WorkModule::on_flag(fighter.module_accessor, FIGHTER_INSTANCE_WORK_ID_FLAG_FORCE_ESCAPE_AIR_SLIDE);
+        }
+        airdash.into()
+    }
+
     /// Enables cancels that would normally be impossible using the existing cancel system.
     ///
     /// # Arguments

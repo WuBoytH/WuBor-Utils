@@ -42,6 +42,30 @@ pub unsafe fn jump_cancel_common(fighter: &mut L2CFighterCommon, situation: L2CV
     ret.into()
 }
 
+pub unsafe fn airdash_cancel_common(fighter: &mut L2CFighterCommon, situation: L2CValue) -> L2CValue {
+    let mut ret;
+    let terms = [
+        *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ESCAPE_AIR
+    ];
+    let mut enableds = [false; 1];
+    for x in 0..terms.len() {
+        enableds[x] = WorkModule::is_enable_transition_term(fighter.module_accessor, terms[x]);
+        WorkModule::enable_transition_term(fighter.module_accessor, terms[x]);
+    }
+    if situation.get_i32() != *SITUATION_KIND_GROUND {
+        ret = fighter.sub_transition_group_check_air_escape().get_bool();
+    }
+    else {
+        ret = false;
+    }
+    for x in 0..terms.len() {
+        if !enableds[x] {
+            WorkModule::unable_transition_term(fighter.module_accessor, terms[x]);
+        }
+    }
+    ret.into()
+}
+
 pub unsafe fn special_cancel_common(fighter: &mut L2CFighterCommon, situation: L2CValue, allowed_terms: Vec<i32>) -> L2CValue {
     let ret;
     let terms = [
